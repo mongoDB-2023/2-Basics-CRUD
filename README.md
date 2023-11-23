@@ -5,6 +5,7 @@
 4. [Understanding JSON Data](#schema4)
 5. [Comparating JSON & BSON](#schema5)
 6. [CRUD & MongoDB](#schema6)
+7. [Understanding "insertMany()"](#schema7)
 
 <hr>
 
@@ -257,5 +258,62 @@ flights> db.flightData.find()
 flights> 
 ```
 
+<hr>
+
+<a name="schema7"></a>
 
 
+## 7. Understanding "insertMany()"
+
+Se puede insertar varios elementos como un array de diccionarios.
+
+```
+flights> db.flightData.insertMany([
+...   {
+...     "departureAirport": "MUC",
+...     "arrivalAirport": "SFO",
+...     "aircraft": "Airbus A380",
+...     "distance": 12000,
+...     "intercontinental": true
+...   },
+...   {
+...     "departureAirport": "LHR",
+...     "arrivalAirport": "TXL",
+...     "aircraft": "Airbus A320",
+...     "distance": 950,
+...     "intercontinental": false
+...   }
+... ])
+{
+  acknowledged: true,
+  insertedIds: {
+    '0': ObjectId('655f7a3747ec27bf9294c783'),
+    '1': ObjectId('655f7a3747ec27bf9294c784')
+  }
+}
+```
+Se puede comprobar que los `ObjectId` son correlativos
+```
+flights> db.flightData.find()
+[
+  {
+    _id: ObjectId('655f7a3747ec27bf9294c783'),
+    departureAirport: 'MUC',
+    arrivalAirport: 'SFO',
+    aircraft: 'Airbus A380',
+    distance: 12000,
+    intercontinental: true
+  },
+  {
+    _id: ObjectId('655f7a3747ec27bf9294c784'),
+    departureAirport: 'LHR',
+    arrivalAirport: 'TXL',
+    aircraft: 'Airbus A320',
+    distance: 950,
+    intercontinental: false
+  }
+]
+flights> 
+
+
+```
