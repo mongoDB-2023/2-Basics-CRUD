@@ -4,6 +4,7 @@
 3. [Creating Databases & Collections](#schema3)
 4. [Understanding JSON Data](#schema4)
 5. [Comparating JSON & BSON](#schema5)
+6. [CRUD & MongoDB](#schema6)
 
 <hr>
 
@@ -147,10 +148,11 @@ flights> db.flightData.find()
 ```
 <hr>
 
-<a name="schema1"></a>
+<a name="schema5"></a>
 
 
 ## 5. Comparating JSON & BSON
+
 ![basics](./img/basics2.png)
 
 En el caso específico de MongoDB, el formato de almacenamiento predeterminado es BSON (Binary JSON). 
@@ -177,4 +179,83 @@ En resumen, MongoDB utiliza BSON como su formato de almacenamiento interno para 
 de eficiencia y funcionalidad adicional que ofrece en comparación con JSON estándar. Aunque la interfaz 
 de MongoDB se presenta de manera similar a JSON, la elección de BSON subyacente contribuye a la eficiencia 
 y el rendimiento general del sistema.
+
+
+
+<hr>
+
+<a name="schema6"></a>
+
+
+## 6. CRUD & MongoDB
+
+![basics](./img/basics3.png)
+
+- Delete 
+**One**
+```
+flights> db.flightData.deleteOne({departureAirport: 'LHR'})
+{ acknowledged: true, deletedCount: 1 }
+```
+```
+flights> db.flightData.find()
+[
+  {
+    _id: ObjectId('655f66c6a053c6f344e7bb60'),
+    departureAirport: 'MUC',
+    arrivalAirport: 'SFO',
+    aircraft: 'Airbus A380',
+    distance: 12000,
+    intercontinental: true
+  }
+]
+
+```
+**Many**
+```
+flights> db.flightData.deleteMany({marker: 'toDelete'})
+{ acknowledged: true, deletedCount: 2 }
+flights> db.flightData.find()
+```
+- Update
+```
+db.collection.updateOne(
+   { <criterios de consulta> },
+   { $set: { <nuevos valores> } }
+)
+```
+Es importante destacar que updateOne actualiza solo el primer documento que cumple con los criterios de consulta. 
+Si deseas actualizar todos los documentos que coinciden con los criterios, puedes usar updateMany en su lugar.
+
+En el caso que en los `criterios de consulta` esté vacío se añade los nuevos valores a todos los documento de la 
+colección
+
+```
+flights> db.flightData.updateOne({distance:12000}, {$set:{marker:"delete"}})
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+```
+
+```
+flights> db.flightData.find()
+[
+  {
+    _id: ObjectId('655f66c6a053c6f344e7bb60'),
+    departureAirport: 'MUC',
+    arrivalAirport: 'SFO',
+    aircraft: 'Airbus A380',
+    distance: 12000,
+    intercontinental: true,
+    marker: 'delete'
+  }
+]
+flights> 
+```
+
+
 
