@@ -6,6 +6,8 @@
 5. [Comparating JSON & BSON](#schema5)
 6. [CRUD & MongoDB](#schema6)
 7. [Understanding "insertMany()"](#schema7)
+8. [Understanding "find()"](#schema8)
+9. [update vs updateMany()](#schema9)
 
 <hr>
 
@@ -317,3 +319,185 @@ flights>
 
 
 ```
+<hr>
+
+<a name="schema8"></a>
+
+
+## 8. Understanding "find()"
+
+A la sentecia `find()` le podemos poner un diccionario con lo que queremos buscar.
+
+```
+flights> db.flightData.find({aircraft:'Airbus A380'})
+[
+  {
+    _id: ObjectId('655f7a3747ec27bf9294c783'),
+    departureAirport: 'MUC',
+    arrivalAirport: 'SFO',
+    aircraft: 'Airbus A380',
+    distance: 12000,
+    intercontinental: true
+  }
+]
+
+```
+Al poner le dentro del find un diccionario con el $ podemos hacer búsquedas para valores mayores que, con esta 
+sentencia `{distance:{$gt:10000}}`
+```
+flights> db.flightData.find({distance:{$gt:10000}})
+[
+  {
+    _id: ObjectId('655f7a3747ec27bf9294c783'),
+    departureAirport: 'MUC',
+    arrivalAirport: 'SFO',
+    aircraft: 'Airbus A380',
+    distance: 12000,
+    intercontinental: true
+  }
+]
+```
+Algunos de los operadores más comunes incluyen:
+
+**Operadores de Comparación:**
+
+- $eq: Igual a
+- $ne: No igual a
+- $lt: Menor que
+- $lte: Menor o igual a
+- $gt: Mayor que
+- $gte: Mayor o igual a
+
+**Operadores Lógicos:**
+
+- $and: Cumple con todos los criterios
+- $or: Cumple con al menos uno de los criterios
+- $not: No cumple con el criterio especificado
+- $nor: No cumple con ninguno de los criterios
+
+**Otros Operadores:**
+
+- $in: Coincide con alguno de los valores especificados en un array
+- $nin: No coincide con ninguno de los valores especificados en un array
+- $exists: Coincide con documentos que contienen o no contienen un campo específico
+
+
+- Cursor Object
+Cuando ejecutas find(), MongoDB devuelve un cursor. Un cursor es un puntero a los resultados de la consulta que 
+puedes iterar para acceder a los documentos recuperados.
+
+Algunas de las acciones comunes que puedes realizar son las siguientes:
+
+**Métodos de Filtrado:**
+- .sort(): Ordena los resultados en función de un campo dado.
+- .limit(): Limita el número de documentos devueltos.
+- .skip(): Omite un número específico de documentos al inicio.
+- .projection(): Proyecta (selecciona) campos específicos para devolver.
+
+
+**Métodos de Iteración:**
+- .forEach(): Itera sobre los documentos y ejecuta una función para cada uno.
+- .toArray(): Convierte los resultados en un array.
+
+**Métodos de Conteo y Estadísticas:**
+- .countDocuments(): Devuelve el número de documentos que coinciden con la consulta.
+- .explain(): Proporciona estadísticas sobre el rendimiento de la consulta.
+
+**Operaciones de Agregación:**
+- .aggregate(): Permite realizar operaciones de agregación más complejas utilizando el framework de agregación de MongoDB.
+
+
+- Ejemplo:
+```
+flights> const resultadoAgregacion = db.passengers.aggregate([ { $group: { _id: null, edadPromedio: { $avg: "$age" } } }] ).toArray()
+
+flights> db.passengers.insertOne({resultadoAgregacion})
+{
+  acknowledged: true,
+  insertedId: ObjectId('656077b1908c91a7cd6a8ad9')
+}
+```
+
+
+<hr>
+
+<a name="schema9"></a>
+
+
+## 9. update vs updateMany()
+
+- updateOne()
+Para actualizar un documento siempre hay que poner el operador atómico `$set`
+
+```
+flights> db.flightData.updateOne({_id:ObjectId('655f7a3747ec27bf9294c783')}, {$set:{dealyed:true}})
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+```
+
+- updateMany()
+
+
+```
+flights> db.flightData.updateMany ({distance:{$gt :900}}, {$set:{dealyed:false}})
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 2,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+flights> db.flightData.find()
+[
+  {
+    _id: ObjectId('655f7a3747ec27bf9294c783'),
+    departureAirport: 'MUC',
+    arrivalAirport: 'SFO',
+    aircraft: 'Airbus A380',
+    distance: 12000,
+    intercontinental: true,
+    dealyed: false
+  },
+  {
+    _id: ObjectId('655f7a3747ec27bf9294c784'),
+    departureAirport: 'LHR',
+    arrivalAirport: 'TXL',
+    aircraft: 'Airbus A320',
+    distance: 950,
+    intercontinental: false,
+    dealyed: false
+  }
+]
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
