@@ -8,6 +8,8 @@
 7. [Understanding "insertMany()"](#schema7)
 8. [Understanding "find()"](#schema8)
 9. [update vs updateMany()](#schema9)
+10. [Projection](#schema10)
+11. [Embedded Documents](#schema11)
 
 <hr>
 
@@ -476,13 +478,130 @@ flights> db.flightData.find()
 
 ```
 
+<hr>
+
+<a name="schema10"></a>
 
 
+## 10. Projection
 
 
+En MongoDB, la "proyección" se refiere a la capacidad de seleccionar y devolver solo los campos específicos 
+de un documento en los resultados de una consulta. La proyección se utiliza para limitar la cantidad de datos 
+transferidos desde el servidor de MongoDB al cliente, lo que puede mejorar la eficiencia y reducir el uso de 
+ancho de banda.
+
+![basics](./img/basics4.png)
 
 
+```
+flights> db.passengers.find({},{name:1})
+[
+  {
+    _id: ObjectId('656073ef908c91a7cd6a8ac3'),
+    name: 'Max Schwarzmueller'
+  },
+  { _id: ObjectId('656073ef908c91a7cd6a8ac4'), name: 'Manu Lorenz' },
+  { _id: ObjectId('656073ef908c91a7cd6a8ac5'), name: 'Chris Hayton' },
+  { _id: ObjectId('656073ef908c91a7cd6a8ac6'), name: 'Sandeep Kumar' },
+  { _id: ObjectId('656073ef908c91a7cd6a8ac7'), name: 'Maria Jones' },
+  {
+    _id: ObjectId('656073ef908c91a7cd6a8ac8'),
+    name: 'Alexandra Maier'
+  },
+  { _id: ObjectId('656073ef908c91a7cd6a8ac9'), name: 'Dr. Phil Evans' },
+  { _id: ObjectId('656073ef908c91a7cd6a8aca'), name: 'Sandra Brugge' },
+  { _id: ObjectId('656073ef908c91a7cd6a8acb'), name: 'Elisabeth Mayr' },
+  { _id: ObjectId('656073ef908c91a7cd6a8acc'), name: 'Frank Cube' },
+  { _id: ObjectId('656073ef908c91a7cd6a8acd'), name: 'Karandeep Alun' },
+  {
+    _id: ObjectId('656073ef908c91a7cd6a8ace'),
+    name: 'Michaela Drayer'
+  },
+  {
+    _id: ObjectId('656073ef908c91a7cd6a8acf'),
+    name: 'Bernd Hoftstadt'
+  },
+  { _id: ObjectId('656073ef908c91a7cd6a8ad0'), name: 'Scott Tolib' },
+  { _id: ObjectId('656073ef908c91a7cd6a8ad1'), name: 'Freddy Melver' },
+  { _id: ObjectId('656073ef908c91a7cd6a8ad2'), name: 'Alexis Bohed' },
+  { _id: ObjectId('656073ef908c91a7cd6a8ad3'), name: 'Melanie Palace' },
+  { _id: ObjectId('656073ef908c91a7cd6a8ad4'), name: 'Armin Glutch' },
+  { _id: ObjectId('656073ef908c91a7cd6a8ad5'), name: 'Klaus Arber' },
+  {
+    _id: ObjectId('656073ef908c91a7cd6a8ad6'),
+    name: 'Albert Twostone'
+  }
+]
+```
 
+La notación `name: 1` que ves en la proyección indica qué campos quieres incluir en los resultados de tu consulta. 
+En este contexto, 1 significa "incluir", y 0 significa "excluir". 
+
+En el caso `_id` siempre estaŕa en la proyección aunque no lo añadas a la sentencia, pero si no la quieres se
+debe añadir `{_id:0}` hay que expecificarlo.
+
+<hr>
+
+<a name="schema11"></a>
+
+
+## 11. Embedded Documents and arrays
+
+- Embedded
+La embebición de documentos en MongoDB se refiere a la práctica de incluir documentos anidados dentro de 
+otros documentos. 
+
+```
+flights> db.flightData.updateMany({},{$set:{status: {description:'on-time',lastupdate:'1 hour ago'}}})
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 2,
+  modifiedCount: 2,
+  upsertedCount: 0
+}
+flights> db.flightData.find()
+[
+  {
+    _id: ObjectId('655f7a3747ec27bf9294c783'),
+    departureAirport: 'MUC',
+    arrivalAirport: 'SFO',
+    aircraft: 'Airbus A380',
+    distance: 12000,
+    intercontinental: true,
+    dealyed: false,
+    status: { description: 'on-time', lastupdate: '1 hour ago' }
+  },
+  {
+    _id: ObjectId('655f7a3747ec27bf9294c784'),
+    departureAirport: 'LHR',
+    arrivalAirport: 'TXL',
+    aircraft: 'Airbus A320',
+    distance: 950,
+    intercontinental: false,
+    dealyed: false,
+    status: { description: 'on-time', lastupdate: '1 hour ago' }
+  }
+]
+
+```
+- Arrays
+```
+flights> db.passengers.updateOne({name:'Albert Twostone'},{$set:{hobbies:['sports','cooking']}})
+  {
+    _id: ObjectId('656073ef908c91a7cd6a8ad6'),
+    name: 'Albert Twostone',
+    age: 68,
+    status: { description: 'on-time', lastupdate: '1 hour ago' },
+    hobbies: [ 'sports', 'cooking' ]
+  }
+```
+
+```
+db.passengers.findOne({name:'Albert Twostone'}).hobbies
+[ 'sports', 'cooking' ]
+```
 
 
 
